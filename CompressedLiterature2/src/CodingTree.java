@@ -24,10 +24,10 @@ public class CodingTree<SuperT> {
 	 */
 	//MyHashTable<String, String> codes; build when working
 	Hashtable<String, String> codes;
-	Hashtable<String, TreeNode<SuperT>> nodes; 
-	PriorityQueue<TreeNode<SuperT>> pq;
+	Hashtable<String, TreeNode> nodes; 
+	PriorityQueue<TreeNode> pq;
 	StringBuilder myHuffCode;
-	TreeNode<SuperT> root;
+	TreeNode root;
 	
 	
 	/**
@@ -76,7 +76,7 @@ public class CodingTree<SuperT> {
 				if (nodes.get(temp.toString()) != null) {
 					nodes.get(temp.toString()).myFreq++;
 				} else {
-					nodes.put(temp.toString(), new TreeNode<SuperT>((SuperT) temp.toString(),
+					nodes.put(temp.toString(), new TreeNode((SuperT) temp.toString(),
 							1, null, null));
 				}
 				
@@ -87,8 +87,7 @@ public class CodingTree<SuperT> {
 					nodes.get(Character.toString(c)).myFreq++;
 				} else {
 					nodes.put(Character.toString(c),
-							new TreeNode<SuperT>((SuperT) Character.toString(c),
-									1, null, null));
+							new TreeNode((SuperT) Character.toString(c),1, null, null));
 				}
 			}
 		}
@@ -102,7 +101,7 @@ public class CodingTree<SuperT> {
 	 * 
 	 * @param root
 	 */
-	private void buildCodes(TreeNode<SuperT> root) {
+	private void buildCodes(TreeNode root) {
 		if (root == null)
 			return;
 		if (root.myLeft != null) {
@@ -128,8 +127,8 @@ public class CodingTree<SuperT> {
 	 */
 	private void buildHuffman() {
 		while (pq.size() > 1) {
-			TreeNode<SuperT> node1 = getMin();
-			TreeNode<SuperT> node2 = getMin();
+			TreeNode node1 = getMin();
+			TreeNode node2 = getMin();
 			pq.add(combineWeights(node1, node2));
 		}
 		
@@ -146,10 +145,10 @@ public class CodingTree<SuperT> {
 	 * @param node2
 	 * @return
 	 */
-	private TreeNode<SuperT> combineWeights(TreeNode<SuperT> node1,
-			TreeNode<SuperT> node2) {
+	private TreeNode combineWeights(TreeNode node1,
+			TreeNode node2) {
 		int newFreq = node1.myFreq + node2.myFreq;
-		TreeNode<SuperT> node = new TreeNode<SuperT>(null, newFreq, node1, node2);
+		TreeNode node = new TreeNode(null, newFreq, node1, node2);
 		return node;
 	}
 	
@@ -157,7 +156,7 @@ public class CodingTree<SuperT> {
 	 * 
 	 * @return
 	 */
-	private TreeNode<SuperT> getMin() {
+	private TreeNode getMin() {
 		return pq.poll();
 	}
 
@@ -166,7 +165,7 @@ public class CodingTree<SuperT> {
 	 * @param root
 	 * @return
 	 */
-	private boolean isLeaf(TreeNode<SuperT> root) {
+	private boolean isLeaf(TreeNode root) {
 		boolean theTruth = false;
 		if (root.myLeft == null && root.myRight == null) {
 			theTruth = true;
@@ -194,28 +193,27 @@ public class CodingTree<SuperT> {
 	 * @version Feb 22, 2016
 	 * @param <T>
 	 */
-	class TreeNode<T extends SuperT> implements Comparable<T> {
+	class TreeNode implements Comparable<SuperT> {
 	// class TreeNode<T extends Comparable<T>> {
-		T myData;
-		TreeNode<T> myLeft;
-		TreeNode<T> myRight;
+		SuperT myData;
+		TreeNode myLeft;
+		TreeNode myRight;
 		int myFreq;
 		
-		public TreeNode(T data, int freq, TreeNode<T> left, TreeNode<T> right) {
+		public TreeNode(SuperT data, int freq, TreeNode left, TreeNode right) {
 			myFreq = freq;
 			myData = data;
 			myLeft = left;
 			myRight = right;
 		}
 		
-		public T getData() {
+		public SuperT getData() {
 			return myData;
 		}
 		
-		// @SuppressWarnings("rawtypes")
 		@SuppressWarnings("unchecked")
-		public int compareTo(T o) {
-			TreeNode<T> test = (TreeNode<T>) o;
+		public int compareTo(SuperT o) {
+			TreeNode test = (TreeNode) o;
 			if( this.myFreq > test.myFreq) return 1;
 			if(myFreq == test.myFreq) {
 				return 0;
