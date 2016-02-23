@@ -1,3 +1,7 @@
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 
 public class CompLitMain {
 
@@ -15,6 +19,28 @@ public class CompLitMain {
 	 * @param args command line args
 	 */
 	public static void main(String[] args) {
-		//  to do
+		File inputFile = new File("WarAndPeace.txt");
+		compressText(inputFile);
+	}
+
+	private static void compressText(File inputFile) {
+		BufferedReader reader = null;
+		StringBuilder str = new StringBuilder();
+		
+		
+		
+		try {
+			reader = new BufferedReader(new FileReader(inputFile));
+			
+			while (reader.ready()) {
+				str.append((char) reader.read());
+			}
+			reader.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		CodingTree tree = new CodingTree(str.toString());
+		
 	}
 }

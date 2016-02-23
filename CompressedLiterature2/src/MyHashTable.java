@@ -9,9 +9,10 @@ public class MyHashTable<K, V> {
 	 * will use capacity  2^15 = 32768). K is the type of the keys 
 	 *  V is the type of the values
 	 */
-	public MyHashTable<K, V>(int capacity) {
+	/*public MyHashTable<K, V>(int capacity) {
 		// to do
-	}
+	}*/
+	
 	/**
 	 * update or add the newValue to the bucket hash(searchKey).
 	 * if hash(key) is full use linear probing to find the next
@@ -29,6 +30,7 @@ public class MyHashTable<K, V> {
 	 * @return ..
 	 */
 	public V get(K searchKey) {
+		return null;
 		// to do
 	}
 	
@@ -38,6 +40,7 @@ public class MyHashTable<K, V> {
 	 * @return ...
 	 */
 	public boolean containsKey(K searchKey) {
+		return false;
 		// to do
 	}
 	
@@ -53,6 +56,7 @@ public class MyHashTable<K, V> {
 	 * @return integer representing...
 	 */
 	private int hashKey(K key) {
+		return 0;
 		// to do
 	}
 }
