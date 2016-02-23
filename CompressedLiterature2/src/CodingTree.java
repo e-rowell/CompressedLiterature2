@@ -1,4 +1,9 @@
+
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 
 /* Authors: Nicholas Hays and Ethan Rowell
  * Date: 2/9/2016
@@ -17,8 +22,11 @@ public class CodingTree {
 	 * public​ hash table of words or separators used as keys to retrieve strings of 1s
 	 * and 0s as values.
 	 */
-	MyHashTable<String, String> codes;
-	
+	//MyHashTable<String, String> codes; build when working
+	Hashtable<String, String> codes;
+	PriorityQueue<TreeNode> pq;
+	StringBuilder myHuffCode;
+	char[] myDelimeter = "[a-zA-Z0-9]";
 	/**
 	 *  a ​public​ data member that is the message encoded using the Huffman codes.
 	 */
@@ -33,7 +41,23 @@ public class CodingTree {
 	 * @param fullText the text to be encoded
 	 */
 	public CodingTree(String fullText) {
-		codes = new MyHashTable<>();
+		//codes = new MyHashTable<>();
+		codes = new Hashtable<>(2^15);
+		pq = new PriorityQueue<>();
+		myHuffCode = new StringBuilder();
+		parseWords(fullText);
+		
+	}
+	private void parseWords(String theOrigMsg) {
+		String temp;
+		for(char c: theOrigMsg.toCharArray()) {
+			if(isDelimeter(c))
+		}
+		
+	}
+	private boolean isDelimeter(char c) {
+		if()
+		return false;
 	}
 	/**
 	 * this method will take the output of Huffman’s encoding and produce the original text.
@@ -45,5 +69,40 @@ public class CodingTree {
 		// (Optional) to do 
 		return bits;
 	}
+	
+	
+	
+	
+	class TreeNode<T> implements Comparable<T> {
+		String myData;
+		TreeNode<T> myLeft;
+		TreeNode<T> myRight;
+		int myFreq;
+		
+		public TreeNode(String data, int freq, TreeNode left, TreeNode right) {
+			myFreq = freq;
+			myData = data;
+			myLeft = left;
+			myRight = right;
+		}
+		
+		
+		@SuppressWarnings("rawtypes")
+		public int compareTo(T o) {
+			TreeNode test = (TreeNode) o;
+			if( this.myFreq > test.myFreq) return 1;
+			if(myFreq == test.myFreq) {
+				return 0;
+			}
+			return -1;
+		}
+		
+	}
+	
+	
+	
+	
+	
+	
 	
 }
