@@ -27,8 +27,6 @@ public class CompLitMain {
 		BufferedReader reader = null;
 		StringBuilder str = new StringBuilder();
 		
-		
-		
 		try {
 			reader = new BufferedReader(new FileReader(inputFile));
 			
