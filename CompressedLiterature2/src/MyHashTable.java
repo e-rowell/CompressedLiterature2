@@ -3,15 +3,19 @@
  * Assignment 3: Compressed Literature2
  * Presented For: Dr. Chris Marriott
  */
-public class MyHashTable<K, V> {
+public class MyHashTable<K,V> {
+	
+	
+	
+	K key;
+	V value;
 	/**
 	 * creates a hash table with capacity number of buckets (for this assignment you
 	 * will use capacity  2^15 = 32768). K is the type of the keys 
 	 *  V is the type of the values
 	 */
-	/*public MyHashTable<K, V>(int capacity) {
+	public MyHashTable<K,V>(int capacity) {
 		// to do
-	}*/
 	
 	/**
 	 * update or add the newValue to the bucket hash(searchKey).

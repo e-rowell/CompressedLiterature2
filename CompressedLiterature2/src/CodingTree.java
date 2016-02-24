@@ -1,4 +1,5 @@
 
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -16,7 +17,7 @@ import java.util.regex.Pattern;
  * @author Nicholas Hays and Ethan Rowell
  *
  */
-public class CodingTree<SuperT> {
+public class CodingTree<T> {
 	
 	/**
 	 * public​ hash table of words or separators used as keys to retrieve strings of 1s
@@ -27,6 +28,7 @@ public class CodingTree<SuperT> {
 	Hashtable<String, TreeNode> nodes; 
 	PriorityQueue<TreeNode> pq;
 	StringBuilder myHuffCode;
+	ArrayList<String> myTextWords;
 	TreeNode root;
 	
 	
@@ -49,6 +51,7 @@ public class CodingTree<SuperT> {
 		nodes = new Hashtable<>();
 		pq = new PriorityQueue<>();
 		myHuffCode = new StringBuilder();
+		myTextWords = new ArrayList<>();
 		parseWords(fullText);
 		buildHuffman();
 	}
@@ -68,6 +71,8 @@ public class CodingTree<SuperT> {
 			if(matcher.matches()) { 
 				temp.append(c);
 			} else {
+				myTextWords.add(temp.toString());
+				myTextWords.add("" + c);
 				// System.out.println();
 				// System.out.println(temp.toString());
 				// System.out.println("Delimited by " + Integer.toHexString(c | 0x10000).substring(1));
@@ -76,7 +81,7 @@ public class CodingTree<SuperT> {
 				if (nodes.get(temp.toString()) != null) {
 					nodes.get(temp.toString()).myFreq++;
 				} else {
-					nodes.put(temp.toString(), new TreeNode((SuperT) temp.toString(),
+					nodes.put(temp.toString(), new TreeNode((T) temp.toString(),
 							1, null, null));
 				}
 				
@@ -87,7 +92,7 @@ public class CodingTree<SuperT> {
 					nodes.get(Character.toString(c)).myFreq++;
 				} else {
 					nodes.put(Character.toString(c),
-							new TreeNode((SuperT) Character.toString(c),1, null, null));
+							new TreeNode((T) Character.toString(c),1, null, null));
 				}
 			}
 		}
@@ -132,9 +137,6 @@ public class CodingTree<SuperT> {
 			pq.add(combineWeights(node1, node2));
 		}
 		
-		for(String data : codes.keySet()) {
-			System.out.println(data);
-		}
 		root = pq.peek();
 		buildCodes(root);
 	}
@@ -193,26 +195,26 @@ public class CodingTree<SuperT> {
 	 * @version Feb 22, 2016
 	 * @param <T>
 	 */
-	class TreeNode implements Comparable<SuperT> {
+	class TreeNode implements Comparable<T> {
 	// class TreeNode<T extends Comparable<T>> {
-		SuperT myData;
+		T myData;
 		TreeNode myLeft;
 		TreeNode myRight;
 		int myFreq;
 		
-		public TreeNode(SuperT data, int freq, TreeNode left, TreeNode right) {
+		public TreeNode(T data, int freq, TreeNode left, TreeNode right) {
 			myFreq = freq;
 			myData = data;
 			myLeft = left;
 			myRight = right;
 		}
 		
-		public SuperT getData() {
+		public T getData() {
 			return myData;
 		}
 		
 		@SuppressWarnings("unchecked")
-		public int compareTo(SuperT o) {
+		public int compareTo(T o) {
 			TreeNode test = (TreeNode) o;
 			if( this.myFreq > test.myFreq) return 1;
 			if(myFreq == test.myFreq) {
