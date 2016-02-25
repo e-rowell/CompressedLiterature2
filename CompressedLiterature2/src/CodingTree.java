@@ -102,6 +102,17 @@ public class CodingTree<T> {
 		}
 	}
 	
+
+	public String encodeText(StringBuilder text) {
+		StringBuilder binString = new StringBuilder();
+		
+		for (String word : myTextWords) {
+			binString.append(codes.get(word));
+		}
+		return binString.toString();
+	}
+	
+	
 	/**
 	 * 
 	 * @param root

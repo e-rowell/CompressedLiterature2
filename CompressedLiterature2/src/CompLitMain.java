@@ -65,7 +65,6 @@ public class CompLitMain {
 	}
 	
 	private static String encodeText(CodingTree<String> tree, StringBuilder text) {
-
 		String huffString = tree.encodeText(text);	
 		// testMethod(huffString);
 		
@@ -88,5 +87,4 @@ public class CompLitMain {
 		}
 		return huffString.toString();
 	}
-	
 }
