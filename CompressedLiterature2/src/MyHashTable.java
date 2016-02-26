@@ -1,8 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.jws.WebParam.Mode;
-
 /* Authors: Nicholas Hays and Ethan Rowell
  * Date: 2/9/2016
  * Assignment 3: Compressed Literature2
@@ -119,11 +117,11 @@ public class MyHashTable<K, V> {
 		public K getKey() {
 			return myKey;
 		}
-
+		// for rehash
 		public void setKey(K key) {
 			myKey = key;
 		}
-
+		// for rehash
 		public V getValue() {
 			return myValue;
 		}
