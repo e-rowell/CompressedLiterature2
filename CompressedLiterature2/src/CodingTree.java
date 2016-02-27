@@ -1,5 +1,6 @@
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -18,25 +19,25 @@ import java.util.regex.Pattern;
  *
  */
 public class CodingTree<T> {
-	
+
 	/**
 	 * public​ hash table of words or separators used as keys to retrieve strings of 1s
 	 * and 0s as values.
 	 */
 	//MyHashTable<String, String> codes; build when working
-	Hashtable<String, String> codes;
-	Hashtable<String, TreeNode> nodes; 
+	MyHashTable<String, String> codes;
+	MyHashTable<String, TreeNode> nodes; 
 	PriorityQueue<TreeNode> pq;
 	StringBuilder myHuffCode;
 	ArrayList<String> myTextWords;
 	TreeNode root;
-	
-	
+
+
 	/**
 	 *  a ​public​ data member that is the message encoded using the Huffman codes.
 	 */
 	String bits;
-	
+
 	/**
 	 * Constructor that takes the text of an English message to be compressed.
 	 * The constructor is responsible for calling all methods that carry out the 
@@ -47,15 +48,15 @@ public class CodingTree<T> {
 	 */
 	public CodingTree(String fullText) {
 		//codes = new MyHashTable<>();
-		codes = new Hashtable<>(2^15);
-		nodes = new Hashtable<>();
+		codes = new MyHashTable<>(32768);
+		nodes = new MyHashTable<>(32768);
 		pq = new PriorityQueue<>();
 		myHuffCode = new StringBuilder();
 		myTextWords = new ArrayList<>();
 		parseWords(fullText);
 		buildHuffman();
 	}
-	
+
 	/**
 	 * 
 	 * @param theOrigMsg
@@ -63,9 +64,9 @@ public class CodingTree<T> {
 	@SuppressWarnings("unchecked")
 	private void parseWords(String theOrigMsg) {
 		StringBuilder temp = new StringBuilder();
-		Pattern pattern = Pattern.compile("[a-zA-Z0-9-']");
+		Pattern pattern = Pattern.compile("[-a-zA-Z0-9']");
 		Matcher matcher;
-		
+
 		for(char c : theOrigMsg.toCharArray()) {
 			matcher = pattern.matcher(Character.toString(c));
 			if(matcher.matches()) { 
@@ -76,7 +77,7 @@ public class CodingTree<T> {
 				// System.out.println();
 				// System.out.println(temp.toString());
 				// System.out.println("Delimited by " + Integer.toHexString(c | 0x10000).substring(1));
-				
+
 				// gets the word
 				if (nodes.get(temp.toString()) != null) {
 					nodes.get(temp.toString()).myFreq++;
@@ -84,9 +85,9 @@ public class CodingTree<T> {
 					nodes.put(temp.toString(), new TreeNode((T) temp.toString(),
 							1, null, null));
 				}
-				
+
 				temp.setLength(0);
-				
+
 				// gets the char the delimited the word
 				if (nodes.get(Character.toString(c)) != null) {
 					nodes.get(Character.toString(c)).myFreq++;
@@ -96,23 +97,23 @@ public class CodingTree<T> {
 				}
 			}
 		}
-		
+
 		for (String string : nodes.keySet()) {
 			pq.add(nodes.get(string));
 		}
 	}
-	
+
 
 	public String encodeText(StringBuilder text) {
 		StringBuilder binString = new StringBuilder();
-		
+
 		for (String word : myTextWords) {
 			binString.append(codes.get(word));
 		}
 		return binString.toString();
 	}
-	
-	
+
+
 	/**
 	 * 
 	 * @param root
@@ -129,15 +130,14 @@ public class CodingTree<T> {
 		}
 		buildCodes(root.myRight);
 		if (isLeaf(root)) {
-			System.out.println(myHuffCode.toString());
 			codes.put((String) root.myData, myHuffCode.toString());
 		}
 		if (myHuffCode.length() > 0) {
 			myHuffCode.deleteCharAt(myHuffCode.length() - 1);
 		}
 	}
-	
-	
+
+
 	/**
 	 * 
 	 */
@@ -147,11 +147,11 @@ public class CodingTree<T> {
 			TreeNode node2 = getMin();
 			pq.add(combineWeights(node1, node2));
 		}
-		
+
 		root = pq.peek();
 		buildCodes(root);
 	}
-	
+
 	/**
 	 * 
 	 * @param node1
@@ -164,7 +164,7 @@ public class CodingTree<T> {
 		TreeNode node = new TreeNode(null, newFreq, node1, node2);
 		return node;
 	}
-	
+
 	/**
 	 * 
 	 * @return
@@ -185,21 +185,56 @@ public class CodingTree<T> {
 		}
 		return theTruth;
 	}
-	
-	
+
+
 	/**
 	 * this method will take the output of Huffman’s encoding and produce the original text.
 	 * @param bits
 	 * @param codes
 	 * @return
 	 */
-	String decode(String bits, Map<String, String> codes) {
-		// (Optional) to do 
-		return bits;
+	/*String decode(String bits, MyHashTable<String, String> codes) {
+		StringBuilder decodedString = new StringBuilder();
+		StringBuilder tempString = new StringBuilder();
+		Map<String, String> reverseMap = new HashMap<>();
+		for(Map.Entry<String, String> entry: codes.entrySet()) {
+			reverseMap.put(entry.getValue(), entry.getKey());
+		}
+		String temp;
+		for (Character character : bits.toCharArray()) {
+			tempString.append(character);
+			temp = reverseMap.get(tempString.toString());
+			if(temp != null) {
+				decodedString.append(temp);
+				tempString.setLength(0);
+			}
+		}
+		return decodedString.toString();
+	}*/
+	public String decode(String binaryString) {
+		StringBuilder decodedString = new StringBuilder();
+		TreeNode node = root;
+
+		for (Character character : binaryString.toCharArray()) {
+			if (character == '0') {
+				node = node.myLeft;
+				if (isLeaf(node)) {
+					decodedString.append(node.myData);
+					node = root;
+				}
+			} else {
+				node = node.myRight;
+				if (isLeaf(node)) {
+					decodedString.append(node.myData);
+					node = root;
+				}
+			}
+		}
+		return decodedString.toString();
 	}
-	
-	
-	
+
+
+
 	/**
 	 * 
 	 * @author Nicholas Hays and Ethan Rowell
@@ -207,23 +242,23 @@ public class CodingTree<T> {
 	 * @param <T>
 	 */
 	class TreeNode implements Comparable<T> {
-	// class TreeNode<T extends Comparable<T>> {
+		// class TreeNode<T extends Comparable<T>> {
 		T myData;
 		TreeNode myLeft;
 		TreeNode myRight;
 		int myFreq;
-		
+
 		public TreeNode(T data, int freq, TreeNode left, TreeNode right) {
 			myFreq = freq;
 			myData = data;
 			myLeft = left;
 			myRight = right;
 		}
-		
+
 		public T getData() {
 			return myData;
 		}
-		
+
 		@SuppressWarnings("unchecked")
 		public int compareTo(T o) {
 			TreeNode test = (TreeNode) o;

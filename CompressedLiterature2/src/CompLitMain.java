@@ -45,18 +45,22 @@ public class CompLitMain {
 		
 		CodingTree<String> tree = new CodingTree<>(str.toString());
 		writeCodes(tree, str);
-		encodeText(tree, str);
+		String binStr = encodeText(tree, str);
+		decodeText(tree, binStr);
+		
 	}
 
 	private static void writeCodes(CodingTree<String> tree, StringBuilder str) {
 		StringBuilder codes = new StringBuilder();
-		codes.append('{');
+		codes.append('[');
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter("codes.txt"));
 			for(String code : tree.codes.keySet()){
-				codes.append(code + "=" + tree.codes.get(code) + ", \n");
+				codes.append(String.format("(%s, %s), ", code, tree.codes.get(code)));
 			}
-			codes.append('}');
+			codes.delete(codes.length() - 2, codes.length()); // removes last comma and space
+			codes.append(']');
+			
 			bw.write(codes.toString());
 			bw.close();
 		} catch (IOException exception) {
@@ -86,5 +90,18 @@ public class CompLitMain {
 			e.printStackTrace();
 		}
 		return huffString.toString();
+	}
+	private static void decodeText(CodingTree<String> tree, String encodedText) {
+		String originalText = tree.decode(encodedText);
+		try {
+			BufferedOutputStream origBos = new BufferedOutputStream(new FileOutputStream("decompressed.txt"));
+			char[] chars = originalText.toString().toCharArray();
+			for (char c : chars) {
+				origBos.write(c);
+			}
+			origBos.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
