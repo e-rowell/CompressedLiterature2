@@ -47,7 +47,6 @@ public class CompLitMain {
 		writeCodes(tree, str);
 		String binStr = encodeText(tree, str);
 		decodeText(tree, binStr);
-		
 	}
 
 	private static void writeCodes(CodingTree<String> tree, StringBuilder str) {

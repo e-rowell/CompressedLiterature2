@@ -1,9 +1,6 @@
-import java.awt.RenderingHints.Key;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 /* Authors: Nicholas Hays and Ethan Rowell
  * Date: 2/9/2016
@@ -11,15 +8,12 @@ import java.util.Set;
  * Presented For: Dr. Chris Marriott
  */
 public class MyHashTable<K, V> {
-	private static double LOAD_FACTOR = .75;
 	List<Bucket> buckets;
 	int myCapacity;
 	int myBucketCount;
-	// K myKey;
-	// V myValue;
 	List<Integer> statProbe;
-	private Integer myMaxProbe;
-	private Integer myAvgProbe;
+	private int myMaxProbe;
+	private double myAvgProbe;
 	private int numOfLookups;
 
 	/**
@@ -57,37 +51,32 @@ public class MyHashTable<K, V> {
 	}
 
 	private void linearProbe(int keyHash, K searchKey, V value, int prober) {
-		
+		Bucket tempBucket;
 		while (true) {
-			System.out.println(myBucketCount);
 			
 			if(keyHash == buckets.size()) keyHash = 0;
-			
-			if (buckets.get(keyHash).myKey == null) {
+			tempBucket = buckets.get(keyHash);
+			if (tempBucket.myKey == null) {
 				
 				myBucketCount++;
-				// System.out.println(myBucketCount);
-				
-				buckets.get(keyHash).setKey(searchKey);
-				buckets.get(keyHash).setValue(value);
-				
-				statProbe.add(prober, statProbe.get(prober).intValue() + 1);
-				return;
+				tempBucket.setKey(searchKey);
+				tempBucket.setValue(value);
+				statProbe.set(prober, statProbe.get(prober).intValue() + 1);
+				break;
 			} else {
-				if (searchKey.equals(buckets.get(keyHash).getKey())) {
-					// System.out.println("Same key");
-					buckets.get(keyHash).setValue(value);
-					statProbe.add(prober, statProbe.get(prober).intValue() + 1);
-					return;
+				if (searchKey.equals(tempBucket.getKey())) {
+					tempBucket.setValue(value);
+					statProbe.set(prober, statProbe.get(prober).intValue() + 1);
+					break;
 				} else {
-					// System.out.println("Probing");
-					buckets.get(keyHash).myFlag = true;
+					tempBucket.myFlag = true;
 					keyHash++;
 					prober++;
-					//linearProbe(++keyHash, searchKey, value, ++prober);
 				}
 			}
 		}
+		if (prober > myMaxProbe) myMaxProbe = prober;
+		return;
 	}
 
 	/**
@@ -99,20 +88,20 @@ public class MyHashTable<K, V> {
 	 * @return ..
 	 */
 	public V get(K searchKey) {
-		numOfLookups++;
+		// numOfLookups++;
 		int prober = 0;
 		int hash = hashKey(searchKey);
+		Bucket tempBucket;
 		while(true) {
-			if(buckets.get(hash).myKey == null) {
-				statProbe.add(prober, statProbe.get(prober).intValue() + 1);
+			if(hash == buckets.size()) hash = 0;
+			tempBucket = buckets.get(hash);
+			if(tempBucket.myKey == null) {
 				return null;
 			}
-			if(buckets.get(hash).myKey == searchKey) {
-				statProbe.add(prober, statProbe.get(prober).intValue() + 1);
-				return buckets.get(hash).myValue;
+			if(tempBucket.myKey.equals(searchKey)) {
+				return tempBucket.myValue;
 			} else {
-				if(!buckets.get(hash).myFlag) {
-					statProbe.add(prober, statProbe.get(prober).intValue() + 1);
+				if(!tempBucket.myFlag) {
 					return null;
 				}
 			}
@@ -136,32 +125,37 @@ public class MyHashTable<K, V> {
 	 */
 	public void stats() {
 		genStats();
-		System.out.println("Hash Table Stats \n");
-		System.out.println("================");
-		System.out.println("Number of Entries: " + myBucketCount);
-		System.out.println("Number of Buckets: " + myCapacity);
-		System.out.println("Histogram of Probes: ");
-		System.out.print("[ ");
-		for(int i = 0; i < myMaxProbe; i++) {
-			if(i > 0 && i % 32 == 0) System.out.print("\n");
+		StringBuilder sBuilder = new StringBuilder();
+		sBuilder.append("Hash Table Stats\n");
+		sBuilder.append("================\n");
+		sBuilder.append(String.format("Number of Entries: %d \n", myBucketCount));
+		sBuilder.append(String.format("Number of Buckets: %d \n", myCapacity));
+		sBuilder.append("Histogram of Probes: \n");
+		sBuilder.append("[");
+
+		for (int i = 0; i <= myMaxProbe; i++) {
+			if(i > 0 && i % 32 == 0) sBuilder.append("\n");
 			if(statProbe.get(i) != null) {
-			System.out.print(statProbe.get(i) + ", ");
+			sBuilder.append(statProbe.get(i) + ", ");
 			} else {
-				System.out.print(", 0");
+				sBuilder.append(", 0");
 			}
 		}
-		System.out.println("]");
-		System.out.println("Fill Percentage: " + myBucketCount / myCapacity);
-		System.out.println("Max Linear Probe: " + myMaxProbe);
-		System.out.println("Average Linear Probe: " + myAvgProbe);
+		
+		sBuilder.delete(sBuilder.length() - 2, sBuilder.length());
+		sBuilder.append("]\n");
+		sBuilder.append(String.format("Fill Percentage:  %.6f%% \n", (myBucketCount / (double) myCapacity * 100 )));
+		sBuilder.append(String.format("Max Linear Probe: %d \n", myMaxProbe));
+		sBuilder.append(String.format("Average Linear Probe: %.6f", myAvgProbe));
+		
+		System.out.println(sBuilder.toString());
 	}
 
 	private void genStats() {
 		
 		for(int i = 0; i < statProbe.size(); i++) {
 			if(statProbe.get(i) != null) {
-				myAvgProbe += statProbe.get(i);
-				myMaxProbe = statProbe.get(i);
+				myAvgProbe += statProbe.get(i) * i;
 			}
 		}
 		myAvgProbe /= numOfLookups; 
@@ -187,8 +181,8 @@ public class MyHashTable<K, V> {
 		boolean myFlag;
 
 		public Bucket(K key, V value) {
-			key = myKey;
-			value = myValue;
+			myKey = key;
+			myValue = value;
 		}
 
 		public K getKey() {
@@ -204,7 +198,7 @@ public class MyHashTable<K, V> {
 		}
 
 		public V setValue(V value) {
-			return value = myValue;
+			return myValue = value;
 		}
 	}
 
@@ -212,8 +206,8 @@ public class MyHashTable<K, V> {
 	public List<K> keySet() {
 		List<K> keySet = new ArrayList<>();
 		for (Object key : buckets.toArray()) {
-			if (key != null) {
-				keySet.add((K) key);
+			if (((Bucket) key).myKey != null) {
+				keySet.add(((Bucket) key).myKey);
 			}
 		}
 		return keySet;

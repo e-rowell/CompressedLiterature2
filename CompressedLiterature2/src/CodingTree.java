@@ -1,8 +1,5 @@
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -67,13 +64,16 @@ public class CodingTree<T> {
 		Pattern pattern = Pattern.compile("[-a-zA-Z0-9']");
 		Matcher matcher;
 
+		
 		for(char c : theOrigMsg.toCharArray()) {
 			matcher = pattern.matcher(Character.toString(c));
 			if(matcher.matches()) { 
 				temp.append(c);
 			} else {
-				myTextWords.add(temp.toString());
-				myTextWords.add("" + c);
+				if (temp.toString().length() > 0) {
+					myTextWords.add(temp.toString());
+				}
+				myTextWords.add(Character.toString(c));
 				// System.out.println();
 				// System.out.println(temp.toString());
 				// System.out.println("Delimited by " + Integer.toHexString(c | 0x10000).substring(1));
@@ -82,8 +82,7 @@ public class CodingTree<T> {
 				if (nodes.get(temp.toString()) != null) {
 					nodes.get(temp.toString()).myFreq++;
 				} else {
-					nodes.put(temp.toString(), new TreeNode((T) temp.toString(),
-							1, null, null));
+					nodes.put(temp.toString(), new TreeNode((T) temp.toString(), 1, null, null));
 				}
 
 				temp.setLength(0);
@@ -110,6 +109,7 @@ public class CodingTree<T> {
 		for (String word : myTextWords) {
 			binString.append(codes.get(word));
 		}
+		nodes.stats();
 		return binString.toString();
 	}
 
