@@ -4,16 +4,18 @@ import java.util.PriorityQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/* Authors: Nicholas Hays and Ethan Rowell
+/**
+ * @author Nicholas Hays and Ethan Rowell
  * Date: 2/9/2016
  * Assignment 3: Compressed Literature2
  * Presented For: Dr. Chris Marriott
  */
 
 /**
+ * A coding tree object provides methods to compress textual data
+ * using Huffman's encoding algorithm. 
  * 
  * @author Nicholas Hays and Ethan Rowell
- *
  */
 public class CodingTree<T> {
 
@@ -21,7 +23,6 @@ public class CodingTree<T> {
 	 * public​ hash table of words or separators used as keys to retrieve strings of 1s
 	 * and 0s as values.
 	 */
-	//MyHashTable<String, String> codes; build when working
 	MyHashTable<String, String> codes;
 	MyHashTable<String, TreeNode> nodes; 
 	PriorityQueue<TreeNode> pq;
@@ -44,7 +45,6 @@ public class CodingTree<T> {
 	 * @param fullText the text to be encoded
 	 */
 	public CodingTree(String fullText) {
-		//codes = new MyHashTable<>();
 		codes = new MyHashTable<>(32768);
 		nodes = new MyHashTable<>(32768);
 		pq = new PriorityQueue<>();
@@ -55,8 +55,10 @@ public class CodingTree<T> {
 	}
 
 	/**
-	 * 
-	 * @param theOrigMsg
+	 * parses the incoming message into a collection of unique words seperated by
+	 * specific delimeters. Each word is added to a hashmap that stores the word's 
+	 * string as its key, and a tree node object as its value.  
+	 * @param theOrigMsg the original message to be encoded. 
 	 */
 	@SuppressWarnings("unchecked")
 	private void parseWords(String theOrigMsg) {
@@ -74,11 +76,6 @@ public class CodingTree<T> {
 					myTextWords.add(temp.toString());
 				}
 				myTextWords.add(Character.toString(c));
-				// System.out.println();
-				// System.out.println(temp.toString());
-				// System.out.println("Delimited by " + Integer.toHexString(c | 0x10000).substring(1));
-
-				// gets the word
 				if (nodes.get(temp.toString()) != null) {
 					nodes.get(temp.toString()).myFreq++;
 				} else {
@@ -87,7 +84,6 @@ public class CodingTree<T> {
 
 				temp.setLength(0);
 
-				// gets the char the delimited the word
 				if (nodes.get(Character.toString(c)) != null) {
 					nodes.get(Character.toString(c)).myFreq++;
 				} else {
@@ -102,8 +98,13 @@ public class CodingTree<T> {
 		}
 	}
 
-
-	public String encodeText(StringBuilder text) {
+	/**
+	 * encodes each word from the original input text to a string of '1' and '0's 
+	 * to later be parsed into bytes for compressed storage. 
+	 * 
+	 * @return the string of '1' and '0's. 
+	 */
+	public String encodeText() {
 		StringBuilder binString = new StringBuilder();
 
 		for (String word : myTextWords) {
@@ -115,8 +116,13 @@ public class CodingTree<T> {
 
 
 	/**
+	 * recursively traverses the huffman tree concatenating a '0' if left traverse
+	 * and '1' if right traverse to a temporary string. Once the leaf node is encountered, the 
+	 * string is placed in a map of codes that links the leaf nodes data to the traversed string of 
+	 * '1' and '0's. As the function climbs back up the tree the last '1' or '0' to be added to the 
+	 * temporary string is removed to allocate a unique prefix for the next code. 
 	 * 
-	 * @param root
+	 * @param root the root of the huffman tree. 
 	 */
 	private void buildCodes(TreeNode root) {
 		if (root == null)
@@ -139,7 +145,9 @@ public class CodingTree<T> {
 
 
 	/**
-	 * 
+	 * builds a huffman tree by combining the frequency of the nodes
+	 * with the least weights via polling the priority queue. Uses the root
+	 * node as an argument to build codes from. 
 	 */
 	private void buildHuffman() {
 		while (pq.size() > 1) {
@@ -153,9 +161,11 @@ public class CodingTree<T> {
 	}
 
 	/**
+	 * combines the frequency of the 2 nodes with the lowest weights
+	 * into one node. 
 	 * 
-	 * @param node1
-	 * @param node2
+	 * @param node1 a node of the huffman tree.
+	 * @param node2 a node of the huffman tree. 
 	 * @return
 	 */
 	private TreeNode combineWeights(TreeNode node1,
@@ -166,21 +176,23 @@ public class CodingTree<T> {
 	}
 
 	/**
-	 * 
-	 * @return
+	 * polls the priority queue to find the node with the smallest 
+	 * frequency. 
+	 * @return the minimum node. 
 	 */
 	private TreeNode getMin() {
 		return pq.poll();
 	}
 
 	/**
+	 * checks if the node is a leaf node.  
 	 * 
-	 * @param root
-	 * @return
+	 * @param root the leaf node of the huffman tree. 
+	 * @return the truth value of the node. 
 	 */
-	private boolean isLeaf(TreeNode root) {
+	private boolean isLeaf(TreeNode leaf) {
 		boolean theTruth = false;
-		if (root.myLeft == null && root.myRight == null) {
+		if (leaf.myLeft == null && leaf.myRight == null) {
 			theTruth = true;
 		}
 		return theTruth;
@@ -189,28 +201,10 @@ public class CodingTree<T> {
 
 	/**
 	 * this method will take the output of Huffman’s encoding and produce the original text.
-	 * @param bits
-	 * @param codes
-	 * @return
+	 * 
+	 * @param binaryString the string of '1' and '0's. 
+	 * @return the word associated with the huffman code. 
 	 */
-	/*String decode(String bits, MyHashTable<String, String> codes) {
-		StringBuilder decodedString = new StringBuilder();
-		StringBuilder tempString = new StringBuilder();
-		Map<String, String> reverseMap = new HashMap<>();
-		for(Map.Entry<String, String> entry: codes.entrySet()) {
-			reverseMap.put(entry.getValue(), entry.getKey());
-		}
-		String temp;
-		for (Character character : bits.toCharArray()) {
-			tempString.append(character);
-			temp = reverseMap.get(tempString.toString());
-			if(temp != null) {
-				decodedString.append(temp);
-				tempString.setLength(0);
-			}
-		}
-		return decodedString.toString();
-	}*/
 	public String decode(String binaryString) {
 		StringBuilder decodedString = new StringBuilder();
 		TreeNode node = root;
@@ -236,29 +230,43 @@ public class CodingTree<T> {
 
 
 	/**
-	 * 
+	 * Tree Node represents a data container for holding nodes. Implements comparable 
+	 * to determine ordering.
+	 *  
 	 * @author Nicholas Hays and Ethan Rowell
 	 * @version Feb 22, 2016
-	 * @param <T>
+	 * @param <T> type to compare to. 
 	 */
 	class TreeNode implements Comparable<T> {
-		// class TreeNode<T extends Comparable<T>> {
 		T myData;
 		TreeNode myLeft;
 		TreeNode myRight;
 		int myFreq;
-
+		/**
+		 * constructor for creating nodes which contain data representation. 
+		 * @param data the data to be inserted.
+		 * @param freq the frequency of the word in the text film. 
+		 * @param left the left child node.
+		 * @param right the right child node. 
+		 */
 		public TreeNode(T data, int freq, TreeNode left, TreeNode right) {
 			myFreq = freq;
 			myData = data;
 			myLeft = left;
 			myRight = right;
 		}
-
+		/**
+		 * gets the data object stored in this tree node. 
+		 * 
+		 * @return the data type store in this object. 
+		 */
 		public T getData() {
 			return myData;
 		}
-
+		
+		/**
+		 * compares Tree Node frequencies to determine ordering of priority queue. 
+		 */
 		@SuppressWarnings("unchecked")
 		public int compareTo(T o) {
 			TreeNode test = (TreeNode) o;

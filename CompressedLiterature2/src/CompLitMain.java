@@ -8,8 +8,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import javax.swing.plaf.synth.SynthStyle;
-
 /**
  * Compressed Literature Main.
  * 
@@ -104,7 +102,7 @@ public class CompLitMain {
 	 * @return the binary string.
 	 */
 	private static String encodeText(File compressedFile, CodingTree<String> tree, StringBuilder text) {
-		String huffString = tree.encodeText(text);	
+		String huffString = tree.encodeText();	
 		// testMethod(huffString);
 		
 		int numBytes = huffString.length() / 8;
