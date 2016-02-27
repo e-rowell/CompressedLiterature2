@@ -105,7 +105,6 @@ public class MyHashTable<K, V> {
 	 * @return the value associated with the search key. 
 	 */
 	public V get(K searchKey) {
-		int prober = 0;
 		int hash = hashKey(searchKey);
 		Bucket tempBucket;
 		while(true) {
@@ -122,7 +121,6 @@ public class MyHashTable<K, V> {
 				}
 			}
 			hash++;
-			prober++;
 		}
 	}
 
