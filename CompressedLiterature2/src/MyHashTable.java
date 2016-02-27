@@ -1,10 +1,16 @@
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map.Entry;
 
-/* Authors: Nicholas Hays and Ethan Rowell
- * Date: 2/9/2016
- * Assignment 3: Compressed Literature2
+/**
+ * Hash Table based implementation which provides most of the map operations. This implementation
+ * provides constant time performance for basic operations (get and put) using linear probing to 
+ * find proper bucket values. An instance of HashMap has two parameters that affect its performance:
+ * initial capacity and load factor. The capacity is the number of buckets in the hash table, 
+ * and the initial capacity is simply the capacity at the time the hash table is created.
+ * 
+ * @author Nicholas Hays and Ethan Rowell
+ * @version 2/27/2016
+ * Assignment 4: Compressed Literature2
  * Presented For: Dr. Chris Marriott
  */
 public class MyHashTable<K, V> {
@@ -28,14 +34,15 @@ public class MyHashTable<K, V> {
 		createBuckets();
 	}
 	
-
+	/**
+	 * intializes a list of empty buckets. 
+	 */
 	private void createBuckets() {
 		for(int i = 0; i < myCapacity; i++) {
 			buckets.add(new Bucket(null, null));
 			statProbe.add(new Integer(0));
 		}
 	}
-
 
 	/**
 	 * update or add the newValue to the bucket hash(searchKey). if hash(key) is
@@ -50,6 +57,16 @@ public class MyHashTable<K, V> {
 		linearProbe(hashKey(searchKey), searchKey, value, prober);	
 	}
 
+	/**
+	 * Hashes the search key and performs linear probing until either a matching
+	 * key entry is found or an empty bucket is located to replace or 
+	 * insert the value respectively.  
+	 * 
+	 * @param keyHash the hashed key to look in the data structure.
+	 * @param searchKey the key to match.
+	 * @param value the value to replace or add to the hash table.
+	 * @param prober keeps track of the number of probes. 
+	 */
 	private void linearProbe(int keyHash, K searchKey, V value, int prober) {
 		Bucket tempBucket;
 		while (true) {
@@ -84,11 +101,10 @@ public class MyHashTable<K, V> {
 	 * hash(searchKey) doesn’t contain the value use linear probing to find the
 	 * appropriate value.
 	 * 
-	 * @param searchKey..
-	 * @return ..
+	 * @param searchKey the key to search for in the data structure. 
+	 * @return the value associated with the search key. 
 	 */
 	public V get(K searchKey) {
-		// numOfLookups++;
 		int prober = 0;
 		int hash = hashKey(searchKey);
 		Bucket tempBucket;
@@ -113,8 +129,8 @@ public class MyHashTable<K, V> {
 	/**
 	 * return true if there is a value stored for SearchKey
 	 * 
-	 * @param searchKey
-	 * @return ...
+	 * @param searchKey the key to search for in the data structure. 
+	 * @return the truth value of the search key. 
 	 */
 	public boolean containsKey(K searchKey) {
 		return get(searchKey) != null;
@@ -150,7 +166,9 @@ public class MyHashTable<K, V> {
 		
 		System.out.println(sBuilder.toString());
 	}
-
+	/**
+	 * Monitors the runtime stats on our data structure (i.e average probe length). 
+	 */
 	private void genStats() {
 		
 		for(int i = 0; i < statProbe.size(); i++) {
@@ -166,16 +184,18 @@ public class MyHashTable<K, V> {
 	 * a ​private ​method that takes a key and returns an int in the range
 	 * [0...capacity]
 	 * 
-	 * @param key the key...
-	 * @return integer representing...
+	 * @param key the key to search for in the data structure. 
+	 * @return integer representing the key in the range between [0...capacity].
 	 */
 	private int hashKey(K key) {
 		return (key.hashCode() % (myCapacity / 2)) + (myCapacity / 2);
-		//System.out.println(key.hashCode() % myCapacity);
-		// return key.hashCode() % myCapacity;
 	}
-
-	private class Bucket implements Entry<K, V> {
+	/**
+	 * Container that store key-value pairs for each entry in the hash table. 
+	 * 
+	 * @author Nicholas Hays & Ethan Rowell
+	 */
+	private class Bucket {
 		K myKey;
 		V myValue;
 		boolean myFlag;
@@ -184,24 +204,42 @@ public class MyHashTable<K, V> {
 			myKey = key;
 			myValue = value;
 		}
-
+		/**
+		 * Gets the key from this bucket. 
+		 * 
+		 * @return this buckets key. 
+		 */
 		public K getKey() {
 			return myKey;
 		}
-		// for rehash
+		/**
+		 * Sets this buckets key. 
+		 * 
+		 * @param key the 
+		 */
 		public void setKey(K key) {
 			myKey = key;
 		}
-		// for rehash
+		/**
+		 * for rehash purposes only. 
+		 * never used locally. 
+		 */
 		public V getValue() {
 			return myValue;
 		}
-
-		public V setValue(V value) {
-			return myValue = value;
+		/**
+		 * sets the value of the bucket's key. 
+		 */
+		public void setValue(V value) {
+			myValue = value;
 		}
 	}
-
+	
+	/**
+	 * List of hash keys in the data set.
+	 * 
+	 * @return a list of non null keys contained within the hash table. 
+	 */
 	@SuppressWarnings("unchecked")
 	public List<K> keySet() {
 		List<K> keySet = new ArrayList<>();
